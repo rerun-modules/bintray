@@ -16,7 +16,7 @@ it_fails_when_file_not_found() {
 
     if ! rerun bintray:package-upload --file /bogus/not/there \
         --user somebody --apikey X0X0 \
-        --org ahonor --repo boguses --name bogus --release 0.0.0
+        --org ahonor --repo boguses --name bogus --version 0.0.0
     then
         :
     else

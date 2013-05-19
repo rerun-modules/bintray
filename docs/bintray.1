@@ -1,0 +1,192 @@
+.TH bintray 1 "Sun May 19 09:22:46 PDT 2013" "Version 1.0.0" "RERUN User Manual" 
+.SH NAME
+bintray \- Manage packages in bintray.
+.PP
+.SH SYNOPSIS
+.PP
+\f[CR] 
+rerun [ARGS] bintray: [ package-delete | package-exists | package-update | package-upload ] [OPTIONS]
+\f[]
+
+.SH COMMANDS
+.SH bintray:package-delete \f[]--user <> --apikey <> --org <> --package <> --repo <>
+
+Delete a package version from bintray.
+.PP
+\f[I]OPTIONS\f[]
+.TP
+.B \--user \f[]The bintray subject, aka username.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--apikey \f[]The password used for REST authentication.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--org \f[]The bintray organization.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--package \f[]The package name.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--repo \f[]The targeted repo.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.SH bintray:package-exists \f[]--user <> --apikey <> --org <> --package <> --repo <>
+
+Checks if the package exists.
+.PP
+\f[I]OPTIONS\f[]
+.TP
+.B \--user \f[]The bintray subject, aka username.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--apikey \f[]The password used for REST authentication.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--org \f[]The bintray organization.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--package \f[]The package name.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--repo \f[]The targeted repo.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.SH bintray:package-update \f[]--user <> --apikey <> --org <> --package <> --repo <> --labels <> --description <>
+
+Update the information of the specified package.
+.PP
+\f[I]OPTIONS\f[]
+.TP
+.B \--user \f[]The bintray subject, aka username.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--apikey \f[]The password used for REST authentication.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--org \f[]The bintray organization.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--package \f[]The package name.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--repo \f[]The targeted repo.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--labels \f[]The package labels.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--description \f[]The package description.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.SH bintray:package-upload \f[]--apikey <> --file <> --org <> --repo <> --version <> --user <> --package <> [--descriptor <descriptor.json>]
+
+Uploads and publishes a package file.
+.PP
+\f[I]OPTIONS\f[]
+.TP
+.B \--apikey \f[]The password used for REST authentication.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--file \f[]The file to upload and publish.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--org \f[]The bintray organization.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--repo \f[]The targeted repo.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--version \f[]The package version.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--user \f[]The bintray subject, aka username.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--package \f[]The package name.\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--descriptor \f[]File containing package metadata.\f[]
+required: \f[I]false\f[] ,
+arguments: \f[I]true\f[]
+, default: \f[I]descriptor.json\f[]
+.RS
+.RE ; # command section done.
+
+.SH RETURN VALUES
+.PP
+Successful completion: 0
+.SH AUTHORS
+alexh
+.SH "SEE ALSO"
+rerun
+.SH KEYWORDS
+bintray

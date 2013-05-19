@@ -10,7 +10,7 @@
 # and show its options.
 # 
 #/ command: bintray:package-upload: "publish a package file to bintray"
-#/ usage: rerun bintray:package-upload  --apikey <>  --file <>  --org <>  --repo <>  --release <>  --user <>  --name <> 
+#/ usage: rerun bintray:package-upload  --apikey <>  --file <>  --org <>  --repo <>  --version <>  --user <>  --package <> [ --descriptor <descriptor.json>] 
 
 # Load common functions
 # ---------------------
@@ -47,7 +47,7 @@ set -o nounset -o pipefail
 # declared by `rerun` or by the option parser function.
 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: APIKEY FILE ORG REPO RELEASE USER NAME
+#/ option-variables: APIKEY FILE ORG REPO VERSION USER PACKAGE DESCRIPTOR
 
 # The `rerun_options_parse` function processes the command line
 # arguments. Each accepted command line flag results in setting 
@@ -68,13 +68,19 @@ then
     rerun_die 2 "File not found: $FILE"  
 fi
 
-if ( ! package_exists $USER $APIKEY $ORG $REPO $NAME )
+if ( ! package_exists $USER $APIKEY $ORG $REPO $PACKAGE )
 then
-    package_create $USER $APIKEY $ORG $REPO $NAME ${DESCRIPTOR:-}
+    if [ -f "${DESCRIPTOR}" ]
+    then
+        package_create $USER $APIKEY $ORG $REPO $PACKAGE ${DESCRIPTOR}
+    else
+        package_create $USER $APIKEY $ORG $REPO $PACKAGE
+    fi
+
 fi
-if (package_upload   $USER $APIKEY $ORG $REPO $NAME $RELEASE $FILE)
+if (package_upload   $USER $APIKEY $ORG $REPO $PACKAGE $VERSION $FILE)
 then
-    package_publish  $USER $APIKEY $ORG $REPO $NAME $RELEASE $FILE
+    package_publish  $USER $APIKEY $ORG $REPO $PACKAGE $VERSION $FILE
 else
     exit 1
 fi

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-eqiv='content-type' content='text/html;charset=utf-8'>
+    <title>functions.sh</title>
+    <link rel=stylesheet href="http://jashkenas.github.com/docco/resources/classic/docco.css">
+</head>
+<body>
+<div id=container>
+    <div id=background></div>
+    <table cellspacing=0 cellpadding=0>
+    <thead>
+      <tr>
+        <th class=docs><h1>functions.sh</h1></th>
+        <th class=code></th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr><td class='docs'><p>Shell functions for the bintray-upload module.</p>
+
+</td><td class=code><div class=highlight><pre>
+<span class="c">#/ usage: source RERUN_MODULE_DIR/lib/functions.sh command</span>
+
+</pre></div></td></tr><tr><td class=docs>
+
+<p>Read rerun's public functions</p>
+
+</td><td class=code><div class=highlight><pre>
+. <span class="nv">$RERUN</span> <span class="o">||</span> <span class="o">{</span>
+    <span class="nb">echo</span> &gt;&amp;2 <span class="s2">&quot;ERROR: Failed sourcing rerun function library: \&quot;$RERUN\&quot;&quot;</span>
+    <span class="k">return </span>1
+<span class="o">}</span>
+
+</pre></div></td></tr><tr><td class=docs>
+
+<p>Check usage. Argument should be command name.</p>
+
+</td><td class=code><div class=highlight><pre>
+<span class="o">[[</span> <span class="nv">$# </span><span class="o">=</span> 1 <span class="o">]]</span> <span class="o">||</span> rerun_option_usage
+
+</pre></div></td></tr><tr><td class=docs>
+
+<p>Source the option parser script.</p>
+
+</td><td class=code><div class=highlight><pre>
+<span class="k">if</span> <span class="o">[[</span> -r <span class="nv">$RERUN_MODULE_DIR</span>/commands/<span class="nv">$1</span>/options.sh <span class="o">]]</span> 
+<span class="k">then</span>
+    . <span class="nv">$RERUN_MODULE_DIR</span>/commands/<span class="nv">$1</span>/options.sh <span class="o">||</span> <span class="o">{</span>
+        rerun_die <span class="s2">&quot;Failed loading options parser.&quot;</span>
+    <span class="o">}</span>
+<span class="k">fi</span>
+
+</pre></div></td></tr><tr><td class=docs>
+
+<hr />
+
+<p>Your functions declared here.</p>
+
+<hr />
+
+</td><td class=code><div class=highlight><pre>
+
+<span class="c">#Constants</span>
+<span class="nv">API</span><span class="o">=</span>https://api.bintray.com
+<span class="nv">NOT_FOUND</span><span class="o">=</span>404
+<span class="nv">CONFLICT</span><span class="o">=</span>409
+<span class="nv">SUCCESS</span><span class="o">=</span>200
+<span class="nv">CREATED</span><span class="o">=</span>201
+<span class="nv">PACKAGE_DESCRIPTOR</span><span class="o">=</span>descriptor.json
+
+
+<span class="k">function </span>package_exists <span class="o">{</span>
+   <span class="o">[</span> <span class="nv">$# </span>-ne 5 <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="o">{</span>
+       <span class="nb">echo</span> &gt;&amp;2 <span class="s1">&#39;usage: package_exists subject apikey org repo name&#39;</span>
+       <span class="k">return </span>2
+   <span class="o">}</span>
+   <span class="nb">local </span><span class="nv">subject</span><span class="o">=</span><span class="nv">$1</span> <span class="nv">apikey</span><span class="o">=</span><span class="nv">$2</span> <span class="nv">org</span><span class="o">=</span><span class="nv">$3</span> <span class="nv">repo</span><span class="o">=</span><span class="nv">$4</span> <span class="nv">name</span><span class="o">=</span><span class="nv">$5</span>
+
+   <span class="nv">http_code</span><span class="o">=</span><span class="k">$(</span>curl -u<span class="k">${</span><span class="nv">subject</span><span class="k">}</span>:<span class="k">${</span><span class="nv">apikey</span><span class="k">}</span> --silent -H Accept:application/json <span class="se">\</span>
+       --write-out %<span class="o">{</span>http_code<span class="o">}</span> --output /dev/null <span class="se">\</span>
+       -X GET <span class="k">${</span><span class="nv">API</span><span class="k">}</span>/packages/<span class="k">${</span><span class="nv">org</span><span class="k">}</span>/<span class="k">${</span><span class="nv">repo</span><span class="k">}</span>/<span class="k">${</span><span class="nv">name</span><span class="k">})</span>
+
+   <span class="k">return</span> <span class="k">$(</span><span class="nb">test</span> <span class="s2">&quot;$http_code&quot;</span> <span class="o">=</span> <span class="k">${</span><span class="nv">SUCCESS</span><span class="k">}</span>; <span class="nb">echo</span> <span class="nv">$?</span><span class="k">)</span>
+<span class="o">}</span>
+
+<span class="k">function </span>package_create <span class="o">{</span>
+   <span class="o">[</span> <span class="nv">$# </span>-lt 5 <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="o">{</span>
+       <span class="nb">echo</span> &gt;&amp;2 <span class="s1">&#39;usage: package_create subject apikey org repo name descriptor&#39;</span>
+       <span class="k">return </span>2
+   <span class="o">}</span>
+   <span class="nb">local </span><span class="nv">subject</span><span class="o">=</span><span class="nv">$1</span> <span class="nv">apikey</span><span class="o">=</span><span class="nv">$2</span> <span class="nv">org</span><span class="o">=</span><span class="nv">$3</span> <span class="nv">repo</span><span class="o">=</span><span class="nv">$4</span> <span class="nv">name</span><span class="o">=</span><span class="nv">$5</span> <span class="nv">descriptor</span><span class="o">=</span><span class="k">${</span><span class="nv">6</span><span class="k">:-}</span>
+   <span class="c">#search for a descriptor in the current folder or generate one on the fly</span>
+   <span class="k">if</span> <span class="o">[</span> -f <span class="s2">&quot;${descriptor}&quot;</span> <span class="o">]</span>
+   <span class="k">then</span>
+<span class="k">       </span><span class="nv">data</span><span class="o">=</span><span class="s2">&quot;@${descriptor}&quot;</span>
+   <span class="k">else</span>
+<span class="k">       </span><span class="nv">data</span><span class="o">=</span><span class="s2">&quot;{</span>
+<span class="s2">    \&quot;name\&quot;: \&quot;${name}\&quot;,</span>
+<span class="s2">    \&quot;desc\&quot;: \&quot;\&quot;,</span>
+<span class="s2">    \&quot;desc_url\&quot;: \&quot;\&quot;,</span>
+<span class="s2">    }&quot;</span>
+   <span class="k">fi</span>
+
+<span class="k">   </span><span class="nv">http_code</span><span class="o">=</span><span class="k">$(</span>curl -u<span class="k">${</span><span class="nv">subject</span><span class="k">}</span>:<span class="k">${</span><span class="nv">apikey</span><span class="k">}</span> <span class="se">\</span>
+       -H Accept:application/json -H Content-Type:application/json <span class="se">\</span>
+       --write-out %<span class="o">{</span>http_code<span class="o">}</span>  -o /dev/null -s <span class="se">\</span>
+        -X POST -d  <span class="s2">&quot;${data}&quot;</span> <span class="s2">&quot;${API}/packages/${org}/${repo}&quot;</span><span class="k">)</span>
+
+   <span class="k">case</span> <span class="k">${</span><span class="nv">http_code</span><span class="k">}</span> in
+       <span class="k">${</span><span class="nv">CONFLICT</span><span class="k">}</span><span class="o">)</span> <span class="nb">echo</span> &gt;&amp;2 <span class="s2">&quot;Package already created&quot;</span>;  <span class="k">return </span>0 ;;
+       <span class="k">${</span><span class="nv">CREATED</span><span class="k">}</span><span class="o">)</span> <span class="nb">echo</span> &gt;&amp;2 <span class="s2">&quot;Created /${org}/${repo}/${name}&quot;</span>; <span class="k">return </span>0 ;;
+       *<span class="o">)</span> <span class="nb">echo</span> &gt;&amp;2 <span class="s2">&quot;unexpected response code: $http_code&quot;</span> ; <span class="k">return </span>1 ;;
+   <span class="k">esac</span>
+<span class="o">}</span>
+
+<span class="k">function </span>package_upload <span class="o">{</span>
+   <span class="o">[</span> <span class="nv">$# </span>-ne 7 <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="o">{</span>
+       <span class="nb">echo</span> &gt;&amp;2 <span class="s1">&#39;usage: package_upload subject apikey org repo name version file&#39;</span>
+       <span class="k">return </span>2
+   <span class="o">}</span>
+   <span class="nb">local </span><span class="nv">subject</span><span class="o">=</span><span class="nv">$1</span> <span class="nv">apikey</span><span class="o">=</span><span class="nv">$2</span> <span class="nv">org</span><span class="o">=</span><span class="nv">$3</span> <span class="nv">repo</span><span class="o">=</span><span class="nv">$4</span> <span class="nv">name</span><span class="o">=</span><span class="nv">$5</span> <span class="nv">version</span><span class="o">=</span><span class="nv">$6</span> <span class="nv">file</span><span class="o">=</span><span class="nv">$7</span>
+   <span class="nv">filename</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$file</span><span class="k">)</span>
+
+   <span class="nv">http_code</span><span class="o">=</span><span class="k">$(</span>curl -u<span class="k">${</span><span class="nv">subject</span><span class="k">}</span>:<span class="k">${</span><span class="nv">apikey</span><span class="k">}</span> -H Accept:application/json <span class="se">\</span>
+       --write-out %<span class="o">{</span>http_code<span class="o">}</span> --silent --output /dev/null <span class="se">\</span>
+       -T <span class="k">${</span><span class="nv">file</span><span class="k">}</span> -H X-Bintray-Package:<span class="k">${</span><span class="nv">name</span><span class="k">}</span> -H X-Bintray-Version:<span class="k">${</span><span class="nv">version</span><span class="k">}</span> <span class="se">\</span>
+       -X PUT <span class="k">${</span><span class="nv">API</span><span class="k">}</span>/content/<span class="k">${</span><span class="nv">org</span><span class="k">}</span>/<span class="k">${</span><span class="nv">repo</span><span class="k">}</span>/<span class="k">${</span><span class="nv">name</span><span class="k">}</span>/<span class="k">${</span><span class="nv">version</span><span class="k">}</span>/<span class="k">${</span><span class="nv">filename</span><span class="k">})</span>
+
+   <span class="k">case</span> <span class="k">${</span><span class="nv">http_code</span><span class="k">}</span> in
+       <span class="k">${</span><span class="nv">CREATED</span><span class="k">}</span><span class="o">)</span> <span class="nb">echo</span> &gt;&amp;2 <span class="s2">&quot;Uploaded.&quot;</span>; <span class="k">return </span>0 ;;
+       <span class="k">${</span><span class="nv">CONFLICT</span><span class="k">}</span><span class="o">)</span> <span class="nb">echo</span> &gt;&amp;2 <span class="s2">&quot;Conflict. File already uploaded for /$org/$repo/$name/$version&quot;</span>;  <span class="k">return</span> <span class="nv">$http_code</span> ;;
+       *<span class="o">)</span> <span class="nb">echo</span> &gt;&amp;2 <span class="s2">&quot;unexpected response code: $http_code&quot;</span> ; <span class="k">return </span>1 ;;
+   <span class="k">esac</span>
+<span class="o">}</span>
+
+<span class="k">function </span>package_publish <span class="o">{</span>
+    <span class="o">[</span> <span class="nv">$# </span>-ne 7 <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="o">{</span>
+        <span class="nb">echo</span> &gt;&amp;2 <span class="s1">&#39;usage: package_publish subject apikey org repo name version file&#39;</span>
+        <span class="k">return </span>2
+    <span class="o">}</span>
+    <span class="nb">local </span><span class="nv">subject</span><span class="o">=</span><span class="nv">$1</span> <span class="nv">apikey</span><span class="o">=</span><span class="nv">$2</span> <span class="nv">org</span><span class="o">=</span><span class="nv">$3</span> <span class="nv">repo</span><span class="o">=</span><span class="nv">$4</span> <span class="nv">name</span><span class="o">=</span><span class="nv">$5</span> <span class="nv">version</span><span class="o">=</span><span class="nv">$6</span> <span class="nv">file</span><span class="o">=</span><span class="nv">$7</span>
+
+    <span class="nv">http_code</span><span class="o">=</span><span class="k">$(</span>curl -u<span class="k">${</span><span class="nv">subject</span><span class="k">}</span>:<span class="k">${</span><span class="nv">apikey</span><span class="k">}</span> <span class="se">\</span>
+        --write-out %<span class="o">{</span>http_code<span class="o">}</span> --silent --output /dev/null <span class="se">\</span>
+        -H Accept:application/json -H Content-Type:application/json <span class="se">\</span>
+        -d <span class="s2">&quot;{ \&quot;discard\&quot;: \&quot;false\&quot; }&quot;</span> <span class="se">\</span>
+        -X POST <span class="k">${</span><span class="nv">API</span><span class="k">}</span>/content/<span class="k">${</span><span class="nv">org</span><span class="k">}</span>/<span class="k">${</span><span class="nv">repo</span><span class="k">}</span>/<span class="k">${</span><span class="nv">name</span><span class="k">}</span>/<span class="k">${</span><span class="nv">version</span><span class="k">}</span>/publish<span class="k">)</span>
+
+   <span class="k">case</span> <span class="k">${</span><span class="nv">http_code</span><span class="k">}</span> in
+       <span class="k">${</span><span class="nv">CONFLICT</span><span class="k">}</span><span class="o">)</span> <span class="nb">echo</span> &gt;&amp;2 <span class="s2">&quot;Package already uploaded&quot;</span>;  <span class="k">return </span>0 ;;
+       <span class="k">${</span><span class="nv">SUCCESS</span><span class="k">}</span><span class="o">)</span> <span class="nb">echo</span> &gt;&amp;2 <span class="s2">&quot;Published file.&quot;</span>; <span class="k">return </span>0 ;;
+       *<span class="o">)</span> <span class="nb">echo</span> &gt;&amp;2 <span class="s2">&quot;unexpected response code: $http_code&quot;</span> ; <span class="k">return </span>1 ;;
+   <span class="k">esac</span>        
+<span class="o">}</span>
+
+
+<span class="k">function </span>package_delete <span class="o">{</span>
+    <span class="o">[</span> <span class="nv">$# </span>-ne 5 <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="o">{</span>
+        <span class="nb">echo</span> &gt;&amp;2 <span class="s1">&#39;usage: package_delete subject apikey org repo name&#39;</span>
+        <span class="k">return </span>2
+    <span class="o">}</span>
+    <span class="nb">local </span><span class="nv">subject</span><span class="o">=</span><span class="nv">$1</span> <span class="nv">apikey</span><span class="o">=</span><span class="nv">$2</span> <span class="nv">org</span><span class="o">=</span><span class="nv">$3</span> <span class="nv">repo</span><span class="o">=</span><span class="nv">$4</span> <span class="nv">name</span><span class="o">=</span><span class="nv">$5</span>
+
+    <span class="nv">http_code</span><span class="o">=</span><span class="k">$(</span>curl -u<span class="k">${</span><span class="nv">subject</span><span class="k">}</span>:<span class="k">${</span><span class="nv">apikey</span><span class="k">}</span> <span class="se">\</span>
+        --write-out %<span class="o">{</span>http_code<span class="o">}</span> --silent --output /dev/null <span class="se">\</span>
+        -H Accept:application/json -H Content-Type:application/json <span class="se">\</span>
+        -X DELETE <span class="k">${</span><span class="nv">API</span><span class="k">}</span>/packages/<span class="k">${</span><span class="nv">org</span><span class="k">}</span>/<span class="k">${</span><span class="nv">repo</span><span class="k">}</span>/<span class="k">${</span><span class="nv">name</span><span class="k">}</span> <span class="k">)</span>
+
+   <span class="k">case</span> <span class="k">${</span><span class="nv">http_code</span><span class="k">}</span> in
+       <span class="k">${</span><span class="nv">SUCCESS</span><span class="k">}</span><span class="o">)</span> <span class="nb">echo</span> &gt;&amp;2 <span class="s2">&quot;Deleted package.&quot;</span>; <span class="k">return </span>0 ;;
+       *<span class="o">)</span> <span class="nb">echo</span> &gt;&amp;2 <span class="s2">&quot;unexpected response code: $http_code&quot;</span> ; <span class="k">return </span>1 ;;
+   <span class="k">esac</span>        
+<span class="o">}</span>
+
+<span class="k">function </span>package_update <span class="o">{</span>
+    <span class="o">[</span> <span class="nv">$# </span>-ne 7 <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="o">{</span>
+        <span class="nb">echo</span> &gt;&amp;2 <span class="s1">&#39;usage: package_update subject apikey org repo name desc labels&#39;</span>
+        <span class="k">return </span>2
+    <span class="o">}</span>
+    <span class="nb">local </span><span class="nv">subject</span><span class="o">=</span><span class="nv">$1</span> <span class="nv">apikey</span><span class="o">=</span><span class="nv">$2</span> <span class="nv">org</span><span class="o">=</span><span class="nv">$3</span> <span class="nv">repo</span><span class="o">=</span><span class="nv">$4</span> <span class="nv">name</span><span class="o">=</span><span class="nv">$5</span> <span class="nv">desc</span><span class="o">=</span><span class="nv">$6</span> <span class="nv">labels</span><span class="o">=</span><span class="nv">$7</span>
+
+    quote_listmembers<span class="o">()</span> <span class="o">{</span>
+        <span class="nv">comma_separated_list</span><span class="o">=</span><span class="nv">$1</span>
+        <span class="nb">declare</span> -a arr
+        <span class="nv">arr</span><span class="o">=(</span> <span class="k">${</span><span class="nv">comma_separated_list</span><span class="p">//,/ </span><span class="k">}</span> <span class="o">)</span>
+        <span class="nb">printf</span> <span class="s1">&#39;&quot;%s&quot;,&#39;</span> <span class="k">${</span><span class="nv">arr</span><span class="p">[*]</span><span class="k">}</span>
+    <span class="o">}</span>
+
+       <span class="nv">data</span><span class="o">=</span><span class="s2">&quot;{</span>
+<span class="s2">    \&quot;desc\&quot;: \&quot;${desc}\&quot;,</span>
+<span class="s2">    \&quot;labels\&quot;: [$(quote_listmembers ${labels})],</span>
+<span class="s2">    }&quot;</span>
+    <span class="nv">http_code</span><span class="o">=</span><span class="k">$(</span>curl -u<span class="k">${</span><span class="nv">subject</span><span class="k">}</span>:<span class="k">${</span><span class="nv">apikey</span><span class="k">}</span> <span class="se">\</span>
+        --write-out %<span class="o">{</span>http_code<span class="o">}</span> --silent --output /dev/null <span class="se">\</span>
+        -H Accept:application/json -H Content-Type:application/json <span class="se">\</span>
+        -X PATCH -d <span class="s2">&quot;${data}&quot;</span> <span class="k">${</span><span class="nv">API</span><span class="k">}</span>/packages/<span class="k">${</span><span class="nv">org</span><span class="k">}</span>/<span class="k">${</span><span class="nv">repo</span><span class="k">}</span>/<span class="k">${</span><span class="nv">name</span><span class="k">}</span> <span class="k">)</span>
+
+   <span class="k">case</span> <span class="k">${</span><span class="nv">http_code</span><span class="k">}</span> in
+       <span class="k">${</span><span class="nv">SUCCESS</span><span class="k">}</span><span class="o">)</span> <span class="nb">echo</span> &gt;&amp;2 <span class="s2">&quot;Updated package.&quot;</span>; <span class="k">return </span>0 ;;
+       *<span class="o">)</span> <span class="nb">echo</span> &gt;&amp;2 <span class="s2">&quot;unexpected response code: $http_code&quot;</span> ; <span class="k">return</span> <span class="nv">$http_code</span> ;;
+   <span class="k">esac</span>        
+<span class="o">}</span>
+
+
+
+<span class="k">function </span>package_attributes <span class="o">{</span>
+   <span class="o">[</span> <span class="nv">$# </span>-gt 5 <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="o">{</span>
+       <span class="nb">echo</span> &gt;&amp;2 <span class="s1">&#39;usage: package_attributes subject apikey org repo name ?version?&#39;</span>
+       <span class="k">return </span>2
+   <span class="o">}</span>
+   <span class="nb">local </span><span class="nv">subject</span><span class="o">=</span><span class="nv">$1</span> <span class="nv">apikey</span><span class="o">=</span><span class="nv">$2</span> <span class="nv">org</span><span class="o">=</span><span class="nv">$3</span> <span class="nv">repo</span><span class="o">=</span><span class="nv">$4</span> <span class="nv">name</span><span class="o">=</span><span class="nv">$5</span> <span class="nv">version</span><span class="o">=</span><span class="k">${</span><span class="nv">6</span><span class="k">:-}</span>
+
+   <span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;$version&quot;</span> <span class="o">]</span>
+   <span class="k">then</span>
+<span class="k">       </span><span class="nv">url</span><span class="o">=</span><span class="k">${</span><span class="nv">API</span><span class="k">}</span>/packages/<span class="k">${</span><span class="nv">org</span><span class="k">}</span>/<span class="k">${</span><span class="nv">repo</span><span class="k">}</span>/<span class="k">${</span><span class="nv">name</span><span class="k">}</span>/versions/<span class="nv">$version</span>/attributes
+   <span class="k">else</span>
+<span class="k">       </span><span class="nv">url</span><span class="o">=</span><span class="k">${</span><span class="nv">API</span><span class="k">}</span>/packages/<span class="k">${</span><span class="nv">org</span><span class="k">}</span>/<span class="k">${</span><span class="nv">repo</span><span class="k">}</span>/<span class="k">${</span><span class="nv">name</span><span class="k">}</span>/attributes
+   <span class="k">fi</span>
+<span class="k">   </span><span class="nv">TMPFILE</span><span class="o">=</span><span class="s1">&#39;mktemp /tmp/bintray-attributes.XXXXXXXXXX&#39;</span> <span class="o">||</span> <span class="nb">exit </span>1
+   <span class="nv">http_code</span><span class="o">=</span><span class="k">$(</span>curl -u<span class="k">${</span><span class="nv">subject</span><span class="k">}</span>:<span class="k">${</span><span class="nv">apikey</span><span class="k">}</span> --silent -H Accept:application/json <span class="se">\</span>
+       --write-out %<span class="o">{</span>http_code<span class="o">}</span>  -o <span class="nv">$TMPFILE</span> <span class="se">\</span>
+       -X GET <span class="k">${</span><span class="nv">url</span><span class="k">})</span>
+   <span class="k">case</span> <span class="k">${</span><span class="nv">http_code</span><span class="k">}</span> in
+       <span class="k">${</span><span class="nv">SUCCESS</span><span class="k">}</span><span class="o">)</span>    cat <span class="nv">$TMPFILE</span> <span class="o">&amp;&amp;</span> rm <span class="nv">$TMPFILE</span>; <span class="k">return </span>0 ;;
+       *<span class="o">)</span> <span class="nb">echo</span> &gt;&amp;2 <span class="s2">&quot;unexpected response code: $http_code&quot;</span> ; <span class="k">return </span>1 ;;
+   <span class="k">esac</span>     
+<span class="o">}</span>
+
+
+</td><td class=code><div class=highlight><pre>
+</pre></div></td></tr><tr><td class=docs>
+
+</pre></div></td></tr><tr><td class=docs>
+</td><td class=code><div class=highlight><pre>
+
+</pre></div></td></tr><tr><td class=docs></td><td class='code'></td></tr>
+    </tbody>
+    </table>
+</div>
+</body>
+</html>

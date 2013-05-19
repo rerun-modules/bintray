@@ -10,7 +10,7 @@
 # and show its options.
 # 
 #/ command: bintray:package-update: "Update the information of the specified package"
-#/ usage: rerun bintray:package-update  --user <>  --apikey <>  --org <>  --name <>  --repo <>  --labels <>  --description <> 
+#/ usage: rerun bintray:package-update  --user <>  --apikey <>  --org <>  --package <>  --repo <>  --labels <>  --description <> 
 
 # Load common functions
 # ---------------------
@@ -47,7 +47,7 @@ set -o nounset -o pipefail
 # declared by `rerun` or by the option parser function.
 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: USER APIKEY ORG NAME REPO LABELS DESCRIPTION
+#/ option-variables: USER APIKEY ORG PACKAGE REPO LABELS DESCRIPTION
 
 # The `rerun_options_parse` function processes the command line
 # arguments. Each accepted command line flag results in setting 
@@ -62,7 +62,7 @@ rerun_options_parse "$@"
 # - - -
 # Put the command implementation here.
 # - - -
-package_update $USER $APIKEY $ORG $REPO $NAME "$DESCRIPTION" "$LABELS"
+package_update $USER $APIKEY $ORG $REPO $PACKAGE "$DESCRIPTION" "$LABELS"
 
 
 

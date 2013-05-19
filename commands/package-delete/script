@@ -10,7 +10,7 @@
 # and show its options.
 # 
 #/ command: bintray-upload:package-delete: "Delete a package version from bintray."
-#/ usage: rerun bintray-upload:package-delete  --user <>  --apikey <>  --org <>  --name <>  --repo <> 
+#/ usage: rerun bintray-upload:package-delete  --user <>  --apikey <>  --org <>  --package <>  --repo <> 
 
 # Load common functions
 # ---------------------
@@ -47,7 +47,7 @@ set -o nounset -o pipefail
 # declared by `rerun` or by the option parser function.
 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: USER APIKEY ORG NAME REPO
+#/ option-variables: USER APIKEY ORG PACKAGE REPO
 
 # The `rerun_options_parse` function processes the command line
 # arguments. Each accepted command line flag results in setting 
@@ -62,9 +62,9 @@ rerun_options_parse "$@"
 # - - -
 # Put the command implementation here.
 # - - -
-if ( package_exists $USER $APIKEY $ORG $REPO $NAME )
+if ( package_exists $USER $APIKEY $ORG $REPO $PACKAGE )
 then
-    package_delete $USER $APIKEY $ORG $REPO $NAME || exit 1
+    package_delete $USER $APIKEY $ORG $REPO $PACKAGE || exit 1
 fi
 
 # Done. Exit with last command exit status.

@@ -3,4 +3,4 @@
 # Sat May 18 14:24:05 PDT 2013
 NAME=package-delete
 DESCRIPTION="Delete a package version from bintray."
-OPTIONS="user apikey org name repo"
+OPTIONS="user apikey org package repo"

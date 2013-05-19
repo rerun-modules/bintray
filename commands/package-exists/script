@@ -10,7 +10,7 @@
 # and show its options.
 # 
 #/ command: bintray:package-exists: "checks if the package exists."
-#/ usage: rerun bintray:package-exists  --user <>  --apikey <>  --org <>  --name <>  --repo <> 
+#/ usage: rerun bintray:package-exists  --user <>  --apikey <>  --org <>  --package <>  --repo <> 
 
 # Load common functions
 # ---------------------
@@ -47,7 +47,7 @@ set -o nounset -o pipefail
 # declared by `rerun` or by the option parser function.
 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: USER APIKEY ORG NAME REPO
+#/ option-variables: USER APIKEY ORG PACKAGE REPO
 
 # The `rerun_options_parse` function processes the command line
 # arguments. Each accepted command line flag results in setting 
@@ -63,12 +63,12 @@ rerun_options_parse "$@"
 # Put the command implementation here.
 # - - -
 
-if ! package_exists $USER $APIKEY $ORG $REPO $NAME 
+if ! package_exists $USER $APIKEY $ORG $REPO $PACKAGE 
 then
-    echo >&2 "$NAME package does not exist."
+    echo >&2 "$PACKAGE package does not exist."
     exit 1
 else
-    echo >&2 "$NAME package exists."
+    echo >&2 "$PACKAGE package exists."
 fi
 
 # Done. Exit with last command exit status.
