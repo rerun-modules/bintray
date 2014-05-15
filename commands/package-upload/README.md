@@ -17,5 +17,5 @@ Uploading a file
     USER=ahonor
     
     rerun bintray:package-upload  --user ${USER} --apikey ${APIKEY} \
-      --org ahonor --repo rerun-bintray --package bintray --release 1.0.0 \
-      --file /builds/rerun-bintray/bintray-1.0.0.sh
+      --org ahonor --repo rerun-bintray --package bintray --version 1.0.0 \
+      --file rerun.bin
