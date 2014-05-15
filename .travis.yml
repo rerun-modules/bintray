@@ -1,6 +1,6 @@
 lang: c
 env:
-  - secure: "B8FHkDk+gjjNXC2uavWeBvk+mq0XENMYxC74cgoDVzYENjVooiCSMc1bnywH\nl50smH4RsEkKSlW2y8KgHdIlwjdt0SUd0dUoGH7eD3MzjZ8EWzI83kB8Lpbv\nUqnUpIKDiFA5g3BEOuc5g+rnDNQhHH94NRIdw02Tpn21eqBCp8I="
+  - secure: "OKG83uTOFHfHbxrd8nN5JRVLGirXL/Kjto6UBi0wLi7GpC452nL0P87XQlVI\n+G27H0p38vbZ6WxHoLadu2dW+B4T/J5maPmSZPE4CZVbOORjAx/8fV3SYoBn\nj12ZNEgORkOSqVvnDBxJLDhzwZeVwiFsJcJ9H5S+3PmYIZrX4C0="
 script: ./travis-ci.sh
 notifications:
   irc:
