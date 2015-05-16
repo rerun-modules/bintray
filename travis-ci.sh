@@ -79,11 +79,11 @@ DEB=rerun-${MODULE}_${VERSION}-${RELEASE}_all.deb
     exit 1
 }
 echo "Uploading debian package $DEB to bintray: /${BINTRAY_ORG}/rerun-deb ..."
-$RERUN bintray:package-upload \
+$RERUN bintray:package-upload-deb \
     --user ${BINTRAY_USER} --apikey ${BINTRAY_APIKEY} \
     --org ${BINTRAY_ORG}   --repo rerun-deb \
     --package rerun-${MODULE}      --version $VERSION \
-    --file $DEB
+    --file $DEB --DEB_ARCHITECTURE all
 
 # Build a rpm
 #-------------

@@ -77,17 +77,50 @@ function package_create {
    esac
 }
 
+function package_upload_deb {
+   [ $# -ne 10 ] && {
+       echo >&2 'usage: package_upload subject apikey org repo package version file dist comp arch'
+       return 2
+   }
+   local subject=$1 apikey=$2 org=$3 repo=$4 package=$5 version=$6 file=$7 dist=$8 comp=$9 arch=${10}
+
+   headers="-H X-Bintray-Package:${package} \
+      -H X-Bintray-Version:${version} \
+      -H X-Bintray-Publish:1 \
+      -H X-Bintray-Override:1 \
+      -H X-Bintray-Debian-Distribution:${dist} \
+      -H X-Bintray-Debian-Component:${comp} \
+      -H X-Bintray-Debian-Architecture:${arch}"
+
+   bintray_upload $subject $apikey $org $repo $package $version $file "$headers"
+}
+
 function package_upload {
    [ $# -ne 7 ] && {
        echo >&2 'usage: package_upload subject apikey org repo package version file'
        return 2
    }
    local subject=$1 apikey=$2 org=$3 repo=$4 package=$5 version=$6 file=$7
+
+   headers="-H X-Bintray-Package:${package} \
+      -H X-Bintray-Version:${version} \
+      -H X-Bintray-Publish:1 \
+      -H X-Bintray-Override:1"
+
+   bintray_upload $subject $apikey $org $repo $package $version $file "$headers"
+}
+
+function bintray_upload {
+   [ $# -ne 8 ] && {
+       echo >&2 'usage: bintray_upload subject apikey org repo package version file headers'
+       return 2
+   }
+   local subject=$1 apikey=$2 org=$3 repo=$4 package=$5 version=$6 file=$7 headers="$8"
    filename=$(basename $file)
 
    http_code=$(curl -u${subject}:${apikey} -H Accept:application/json \
        --write-out %{http_code} --silent --output /dev/null \
-       -T ${file} -H X-Bintray-Package:${package} -H X-Bintray-Version:${version} \
+       -T ${file} ${headers} \
        -X PUT ${API}/content/${org}/${repo}/${package}/${version}/${filename})
 
    case ${http_code} in
