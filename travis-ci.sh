@@ -82,8 +82,8 @@ echo "Uploading debian package $DEB to bintray: /${BINTRAY_ORG}/rerun-deb ..."
 $RERUN bintray:package-upload-deb \
     --user ${BINTRAY_USER} --apikey ${BINTRAY_APIKEY} \
     --org ${BINTRAY_ORG}   --repo rerun-deb \
-    --package rerun-${MODULE}      --version $VERSION \
-    --file $DEB --DEB_ARCHITECTURE all
+    --package rerun-${MODULE}      --version $VERSION-${RELEASE:=1} \
+    --file $DEB --deb_architecture all
 
 # Build a rpm
 #-------------
@@ -97,9 +97,9 @@ RPM=rerun-${MODULE}-${VERSION}-${RELEASE}.noarch.rpm
 }
 echo "Uploading rpm package $RPM to bintray: /${BINTRAY_ORG}/rerun-rpm ..."
 $RERUN bintray:package-upload \
-    --user ${BINTRAY_USER} --apikey ${BINTRAY_APIKEY} \
-    --org ${BINTRAY_ORG}   --repo rerun-rpm \
-    --package rerun-${MODULE}      --version $VERSION \
+    --user ${BINTRAY_USER}    --apikey ${BINTRAY_APIKEY} \
+    --org ${BINTRAY_ORG}      --repo rerun-rpm \
+    --package rerun-${MODULE} --version $VERSION-${RELEASE:=1} \
     --file $RPM
 
 
