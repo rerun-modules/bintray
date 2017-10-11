@@ -69,21 +69,21 @@ if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; 
   # Upload and publish to bintray
   echo "Uploading ${BIN} to bintray: /${BINTRAY_ORG}/rerun-modules/${mymod}/${VERSION}..."
   export REPO="rerun-modules"
-  rerun bintray:package-upload --file ${BIN}
+  rerun bintray:package-upload --apikey ${BINTRAY_APIKEY} --file ${BIN}
 
   echo "Uploading debian package ${DEB} to bintray: /${BINTRAY_ORG}/rerun-deb ..."
   export PACKAGE="rerun-${mymod}"
   export REPO="rerun-deb"
-  rerun bintray:package-upload-deb --version "${sysver}" --file ${DEB} --deb_architecture all
-  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${VERSION}.orig.tar.gz"
-  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.debian.tar.xz"
-  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.amd64.build"
-  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.amd64.changes"
-  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.dsc"
+  rerun bintray:package-upload-deb --apikey ${BINTRAY_APIKEY} --version "${sysver}" --file ${DEB} --deb_architecture all
+  rerun bintray:package-upload --apikey ${BINTRAY_APIKEY} --version "${sysver}" --file "${PACKAGE}_${VERSION}.orig.tar.gz"
+  rerun bintray:package-upload --apikey ${BINTRAY_APIKEY} --version "${sysver}" --file "${PACKAGE}_${sysver}.debian.tar.xz"
+  rerun bintray:package-upload --apikey ${BINTRAY_APIKEY} --version "${sysver}" --file "${PACKAGE}_${sysver}.amd64.build"
+  rerun bintray:package-upload --apikey ${BINTRAY_APIKEY} --version "${sysver}" --file "${PACKAGE}_${sysver}.amd64.changes"
+  rerun bintray:package-upload --apikey ${BINTRAY_APIKEY} --version "${sysver}" --file "${PACKAGE}_${sysver}.dsc"
 
   echo "Uploading rpm package ${RPM} to bintray: /${BINTRAY_ORG}/rerun-rpm ..."
   export REPO="rerun-rpm"
-  rerun bintray:package-upload --version ${sysver} --file ${RPM}
+  rerun bintray:package-upload --apikey ${BINTRAY_APIKEY} --version ${sysver} --file ${RPM}
 
 else
   echo "***************************"
