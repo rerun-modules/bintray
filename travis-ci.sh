@@ -8,15 +8,15 @@ set -eu
 # set version patch number to build number from travis
 sed -i -r 's,^VERSION=([0-9]+\.[0-9]+)\.0$,VERSION=\1.'"${TRAVIS_BUILD_NUMBER:?SetupTravisCorrectly}"',g' metadata
 VERSION=$(awk -F= '/VERSION/ {print $2}' metadata)
-MODULE=$(awk -F= '/NAME/ {print $2}' metadata)
+mymod=$(awk -F= '/NAME/ {print $2}' metadata)
 
-echo "Building version ${VERSION:?"Corrupt metadata file"} of ${MODULE:?"Corrupt metadata file"}..."
+echo "Building version ${VERSION:?"Corrupt metadata file"} of ${mymod:?"Corrupt metadata file"}..."
 # Create a scratch directory and change directory to it.
-WORK_DIR=$(mktemp -d "/tmp/build-$MODULE.XXXXXX")
-mkdir "${WORK_DIR:?'Unable to create temp dir'}/bintray"
+WORK_DIR=$(mktemp -d "/tmp/build-${mymod}.XXXXXX")
+mkdir "${WORK_DIR:?'Unable to create temp dir'}/${mymod}"
 
-git clone "file://${TRAVIS_BUILD_DIR:?SetupTravisCorrectly}" "${WORK_DIR}/bintray"
-cp -p metadata "${WORK_DIR}/bintray"/
+git clone "file://${TRAVIS_BUILD_DIR:?SetupTravisCorrectly}" "${WORK_DIR}/${mymod}"
+cp -p metadata "${WORK_DIR}/${mymod}"/
 # Bootstrap
 # ---------
 
@@ -28,20 +28,20 @@ export RERUN_MODULES=${WORK_DIR}:${RERUN_MODULES:-/usr/lib/rerun/modules}
 echo "Packaging the build..."
 
 # Build the archive!
-rerun stubbs:archive --modules $MODULE
+rerun stubbs:archive --modules ${mymod}
 BIN=rerun.sh
 [ ! -f ${BIN} ] && {
     echo >&2 "ERROR: ${BIN} archive was not created."; exit 1
 }
 
 # Test the archive by making it do a command list.
-./${BIN} ${MODULE}
+./${BIN} ${mymod}
 
 # Build a deb
 #-------------
-rerun stubbs:archive --modules $MODULE --format deb --version ${VERSION} --release ${RELEASE:=1}
+rerun stubbs:archive --modules ${mymod} --format deb --version ${VERSION} --release ${RELEASE:=1}
 sysver="${VERSION}-${RELEASE}"
-DEB=rerun-${MODULE}_${sysver}_all.deb
+DEB=rerun-${mymod}_${sysver}_all.deb
 [ ! -f ${DEB} ] && {
     echo >&2 "ERROR: ${DEB} file was not created."
     files=( *.deb )
@@ -50,8 +50,8 @@ DEB=rerun-${MODULE}_${sysver}_all.deb
 }
 # Build a rpm
 #-------------
-rerun stubbs:archive --modules $MODULE --format rpm --version ${VERSION} --release ${RELEASE}
-RPM=rerun-${MODULE}-${sysver}.linux.noarch.rpm
+rerun stubbs:archive --modules ${mymod} --format rpm --version ${VERSION} --release ${RELEASE}
+RPM=rerun-${mymod}-${sysver}.linux.noarch.rpm
 [ ! -f ${RPM} ] && {
     echo >&2 "ERROR: ${RPM} file was not created."
     files=( *.rpm )
@@ -64,15 +64,15 @@ if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; 
   export USER=${BINTRAY_USER}
   export APIKEY=${BINTRAY_APIKEY}
   export ORG=${BINTRAY_ORG}
-  export PACKAGE=${MODULE}
+  export PACKAGE=${mymod}
   
   # Upload and publish to bintray
-  echo "Uploading ${BIN} to bintray: /${BINTRAY_ORG}/rerun-modules/${MODULE}/${VERSION}..."
+  echo "Uploading ${BIN} to bintray: /${BINTRAY_ORG}/rerun-modules/${mymod}/${VERSION}..."
   export REPO="rerun-modules"
   rerun bintray:package-upload --file ${BIN}
 
   echo "Uploading debian package ${DEB} to bintray: /${BINTRAY_ORG}/rerun-deb ..."
-  export PACKAGE="rerun-${MODULE}"
+  export PACKAGE="rerun-${mymod}"
   export REPO="rerun-deb"
   rerun bintray:package-upload-deb --version "${sysver}" --file ${DEB} --deb_architecture all
   rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${VERSION}.orig.tar.gz"
@@ -86,9 +86,11 @@ if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; 
   rerun bintray:package-upload --version ${sysver} --file ${RPM}
 
 else
+  echo "***************************"
   echo "***                     ***"
   echo "*** Travis-CI sayz LGTM ***"
   echo "***                     ***"
+  echo "***************************"
 fi
 
 
