@@ -80,8 +80,8 @@ if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; 
   rerun bintray:package-upload-deb --version "${sysver}" --file "${DEB}" --deb_architecture all
   rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${VERSION}.orig.tar.gz"
   rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.debian.tar.gz"
-  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.amd64.build"
-  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.amd64.changes"
+  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}_amd64.build"
+  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}_amd64.changes"
   rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.dsc"
 
   echo "Uploading rpm package ${RPM} to bintray: /${BINTRAY_ORG}/rerun-rpm ..."
