@@ -7,8 +7,8 @@ set -eu
 # --------
 # set version patch number to build number from travis
 sed -i -r 's,^VERSION=([0-9]+\.[0-9]+)\.0$,VERSION=\1.'"${TRAVIS_BUILD_NUMBER:?SetupTravisCorrectly}"',g' metadata
-VERSION=$(awk -F= '/VERSION/ {print $2}' metadata)
-mymod=$(awk -F= '/NAME/ {print $2}' metadata)
+export VERSION="$(awk -F= '/VERSION/ {print $2}' metadata)"
+mymod="$(awk -F= '/NAME/ {print $2}' metadata)"
 
 echo "Building version ${VERSION:?"Corrupt metadata file"} of ${mymod:?"Corrupt metadata file"}..."
 # Create a scratch directory and change directory to it.
@@ -21,15 +21,15 @@ cp -p metadata "${WORK_DIR}/${mymod}"/
 # ---------
 
 # Setup the rerun execution environment.
-export RERUN_MODULES=${WORK_DIR}:${RERUN_MODULES:-/usr/lib/rerun/modules}
+export RERUN_MODULES="${WORK_DIR}:${RERUN_MODULES:-/usr/lib/rerun/modules}"
 
 # Build the module.
 # -----------------
 echo "Packaging the build..."
 
 # Build the archive!
-rerun stubbs:archive --modules ${mymod}
-BIN=rerun.sh
+rerun stubbs:archive --modules "${mymod}"
+BIN="rerun.sh"
 [ ! -f "${BIN}" ] && {
     echo >&2 "ERROR: ${BIN} archive was not created."; exit 1
 }
