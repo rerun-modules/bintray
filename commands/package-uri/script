@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+#/ command: bintray:package-uri: "Retrieves URIs for remote package artifacts of a specified version."
+#/ usage: rerun bintray:package-uri  --org <>  --repo <>  --package <>  --version <> [ --and-later] [ --extension <>] 
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ORG REPO PACKAGE VERSION AND_LATER EXTENSION
+
+. $RERUN_MODULE_DIR/lib/functions.sh package-uri || { 
+  echo >&2 "Failed loading function library." ; exit 1 ; 
+}
+
+set -o errexit -o nounset -o pipefail
+
+rerun_options_parse "$@"
+
+# Command implementation
+# ----------------------
+
+# - - -
+scraped_versions=
+target_version=
+scraped_files=
+target_extension=
+
+scraped_versions=$(scrape_bintray_package_for_versions "$ORG" "$REPO" "$PACKAGE") || {
+  rerun_die "failed scraping versions with exit code: $?"
+}
+
+target_version=$(echo "$scraped_versions" | grep -F "$VERSION") || {
+  rerun_die "version not found: $VERSION"
+}
+
+scraped_files=$(scrape_bintray_package_version_for_files "$ORG" "$REPO" "$PACKAGE" "$target_version") || {
+  rerun_die "failed scraping files with exit code: $?"
+}
+
+if [ -n "$EXTENSION" ]; then
+  target_extension=$(echo "$scraped_files" | grep -F "$EXTENSION") || {
+    rerun_die "extension not found: $EXTENSION"
+  }
+  format_bintray_download_uri "$ORG" "$REPO" "$PACKAGE" "$target_version" "$target_extension"
+else
+  format_bintray_download_uri "$ORG" "$REPO" "$PACKAGE" "$target_version" "$scraped_files"
+fi
+# - - -
+
+# Done. Exit with last command exit status.
+exit $?
