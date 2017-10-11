@@ -15,8 +15,8 @@ echo "Building version ${VERSION:?"Corrupt metadata file"} of ${MODULE:?"Corrupt
 WORK_DIR=$(mktemp -d "/tmp/build-$MODULE.XXXXXX")
 mkdir "${WORK_DIR:?'Unable to create temp dir'}/bintray"
 
-git commit -m "TravisCI update to v${VERSION}" -a
-git clone "file://${TRAVIS_BUILD_DIR:?SetupTravisCorrectly}/${MODULE}" "${WORK_DIR}/bintray"
+git clone "file://${TRAVIS_BUILD_DIR:?SetupTravisCorrectly}" "${WORK_DIR}/bintray"
+cp -p metadata "${WORK_DIR}/bintray"/
 # Bootstrap
 # ---------
 
