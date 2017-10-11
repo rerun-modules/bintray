@@ -62,7 +62,7 @@ RPM=rerun-${mymod}-${sysver}.linux.noarch.rpm
 if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
 
   echo "Files to publish"
-  ls -1 rerun.sh "rerun-${mymod}*"
+  ls -1 rerun.sh rerun-${mymod}*
 
   export USER=${BINTRAY_USER:?"Setup Travis with BINTRAY_USER env variable"}
   export APIKEY=${BINTRAY_APIKEY:?"Setup Travis with BINTRAY_APIKEY env variable"}
@@ -82,7 +82,7 @@ if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; 
   #rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.debian.tar.xz"
   #rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.amd64.build"
   #rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.amd64.changes"
-  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.dsc"
+  #rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.dsc"
 
   echo "Uploading rpm package ${RPM} to bintray: /${BINTRAY_ORG}/rerun-rpm ..."
   export REPO="rerun-rpm"
