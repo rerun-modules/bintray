@@ -3,107 +3,93 @@
 # Fail fast on errors and unset variables.
 set -eu
 
-
-# The module we're building.
-MODULE=bintray
-# The bintray info.
-BINTRAY_USER=ahonor BINTRAY_ORG=rerun 
-
 # Prepare.
 # --------
+# set version patch number to build number from travis
+sed -i -r 's,^VERSION=([0-9]+\.[0-9]+)\.0$,VERSION=\1.'"${TRAVIS_BUILD_NUMBER:?SetupTravisCorrectly}"',g' metadata
 VERSION=$(awk -F= '/VERSION/ {print $2}' metadata)
-[ -z "${VERSION:-}" ] && {
-    echo >&2 "ERROR: Version info could not be found in metadata file."; exit 1
-}
+MODULE=$(awk -F= '/NAME/ {print $2}' metadata)
 
-
-echo "Building version $VERSION..."
+echo "Building version ${VERSION:?"Corrupt metadata file"} of ${MODULE:?"Corrupt metadata file"}..."
 # Create a scratch directory and change directory to it.
 WORK_DIR=$(mktemp -d "/tmp/build-$MODULE.XXXXXX")
+mkdir "${WORK_DIR:?'Unable to create temp dir'}/bintray"
 
+git commit -m "TravisCI update to v${VERSION}" -a
+git clone "file://${TRAVIS_BUILD_DIR:?SetupTravisCorrectly}/${MODULE}" "${WORK_DIR}/bintray"
 # Bootstrap
 # ---------
 
-# Get rerun so we have access to stubbs:archive command.
-echo "Getting rerun..."
-pushd $WORK_DIR
-git clone git://github.com/rerun/rerun.git rerun
-# chdir to original directory where module this module source resides.
-popd; 
-
 # Setup the rerun execution environment.
-export RERUN_MODULES=$WORK_DIR/rerun/modules
-export RERUN=$WORK_DIR/rerun/rerun
-
-# Add bintray module into the $RERUN_MODULES directory
-echo "Getting bintray module..."
-pushd $RERUN_MODULES
-git clone git://github.com/rerun-modules/bintray.git bintray
-popd
+export RERUN_MODULES=${WORK_DIR}:${RERUN_MODULES:-/usr/lib/rerun/modules}
 
 # Build the module.
 # -----------------
 echo "Packaging the build..."
-# Copy the module files into the work directory.
-mkdir -p $RERUN_MODULES/$MODULE
-echo "copying $MODULE files into working directory..."
-tar cf - * | (cd  $WORK_DIR/rerun/modules/$MODULE/ && tar xvf -)
 
-pushd $WORK_DIR
 # Build the archive!
-$RERUN stubbs:archive --modules $MODULE
+rerun stubbs:archive --modules $MODULE
 BIN=rerun.sh
-[ ! -f $BIN ] && {
-    echo >&2 "ERROR: $BIN archive was not created."; exit 1
+[ ! -f ${BIN} ] && {
+    echo >&2 "ERROR: ${BIN} archive was not created."; exit 1
 }
 
 # Test the archive by making it do a command list.
-./$BIN $MODULE
-
-# Upload and publish to bintray
-echo "Uploading $BIN to bintray: /${BINTRAY_ORG}/rerun-modules/${MODULE}/${VERSION}..."
-$RERUN bintray:package-upload \
-    --user ${BINTRAY_USER} --apikey ${BINTRAY_APIKEY} \
-    --org ${BINTRAY_ORG}   --repo rerun-modules \
-    --package $MODULE      --version $VERSION \
-    --file $BIN
+./${BIN} ${MODULE}
 
 # Build a deb
 #-------------
-$RERUN stubbs:archive --modules $MODULE --format deb --version ${VERSION} --release ${RELEASE:=1}
-DEB=rerun-${MODULE}_${VERSION}-${RELEASE}_all.deb
-[ ! -f $DEB ] && {
-    echo >&2 "ERROR: $DEB file was not created."
+rerun stubbs:archive --modules $MODULE --format deb --version ${VERSION} --release ${RELEASE:=1}
+sysver="${VERSION}-${RELEASE}"
+DEB=rerun-${MODULE}_${sysver}_all.deb
+[ ! -f ${DEB} ] && {
+    echo >&2 "ERROR: ${DEB} file was not created."
     files=( *.deb )
     echo >&2 "ERROR: ${#files[*]} files matching .deb: ${files[*]}"
     exit 1
 }
-echo "Uploading debian package $DEB to bintray: /${BINTRAY_ORG}/rerun-deb ..."
-$RERUN bintray:package-upload-deb \
-    --user ${BINTRAY_USER} --apikey ${BINTRAY_APIKEY} \
-    --org ${BINTRAY_ORG}   --repo rerun-deb \
-    --package rerun-${MODULE}      --version $VERSION-${RELEASE:=1} \
-    --file $DEB --deb_architecture all
-
 # Build a rpm
 #-------------
-$RERUN stubbs:archive --modules $MODULE --format rpm --version ${VERSION} --release ${RELEASE:=1}
-RPM=rerun-${MODULE}-${VERSION}-${RELEASE}.noarch.rpm
-[ ! -f $RPM ] && {
-    echo >&2 "ERROR: $RPM file was not created."
+rerun stubbs:archive --modules $MODULE --format rpm --version ${VERSION} --release ${RELEASE}
+RPM=rerun-${MODULE}-${sysver}.noarch.rpm
+[ ! -f ${RPM} ] && {
+    echo >&2 "ERROR: ${RPM} file was not created."
     files=( *.rpm )
     echo >&2 "ERROR: ${#files[*]} files matching .rpm: ${files[*]}"
     exit 1
 }
-echo "Uploading rpm package $RPM to bintray: /${BINTRAY_ORG}/rerun-rpm ..."
-$RERUN bintray:package-upload \
-    --user ${BINTRAY_USER}    --apikey ${BINTRAY_APIKEY} \
-    --org ${BINTRAY_ORG}      --repo rerun-rpm \
-    --package rerun-${MODULE} --version $VERSION-${RELEASE:=1} \
-    --file $RPM
 
+if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
 
+  export USER=${BINTRAY_USER}
+  export APIKEY=${BINTRAY_APIKEY}
+  export ORG=${BINTRAY_ORG}
+  export PACKAGE=${MODULE}
+  
+  # Upload and publish to bintray
+  echo "Uploading ${BIN} to bintray: /${BINTRAY_ORG}/rerun-modules/${MODULE}/${VERSION}..."
+  export REPO="rerun-modules"
+  rerun bintray:package-upload --file ${BIN}
 
+  echo "Uploading debian package ${DEB} to bintray: /${BINTRAY_ORG}/rerun-deb ..."
+  export PACKAGE="rerun-${MODULE}"
+  export REPO="rerun-deb"
+  rerun bintray:package-upload-deb --version "${sysver}" --file ${DEB} --deb_architecture all
+  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${VERSION}.orig.tar.gz"
+  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.debian.tar.xz"
+  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.amd64.build"
+  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.amd64.changes"
+  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.dsc"
+
+  echo "Uploading rpm package ${RPM} to bintray: /${BINTRAY_ORG}/rerun-rpm ..."
+  export REPO="rerun-rpm"
+  rerun bintray:package-upload --version ${sysver} --file ${RPM}
+
+else
+  echo "***                     ***"
+  echo "*** Travis-CI sayz LGTM ***"
+  echo "***                     ***"
+fi
 
 
 echo "Done."
