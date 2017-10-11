@@ -51,7 +51,7 @@ DEB=rerun-${MODULE}_${sysver}_all.deb
 # Build a rpm
 #-------------
 rerun stubbs:archive --modules $MODULE --format rpm --version ${VERSION} --release ${RELEASE}
-RPM=rerun-${MODULE}-${sysver}.noarch.rpm
+RPM=rerun-${MODULE}-${sysver}.linux.noarch.rpm
 [ ! -f ${RPM} ] && {
     echo >&2 "ERROR: ${RPM} file was not created."
     files=( *.rpm )
