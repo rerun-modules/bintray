@@ -61,9 +61,9 @@ RPM=rerun-${mymod}-${sysver}.linux.noarch.rpm
 
 if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
 
-  export USER=${BINTRAY_USER}
-  export APIKEY=${BINTRAY_APIKEY}
-  export ORG=${BINTRAY_ORG}
+  export USER=${BINTRAY_USER:?"Setup Travis with BINTRAY_USER env variable"}
+  export APIKEY=${BINTRAY_APIKEY:?"Setup Travis with BINTRAY_APIKEY env variable"}
+  export ORG=${BINTRAY_ORG:?"Setup Travis with BINTRAY_ORG env variable"}
   export PACKAGE=${mymod}
   
   # Upload and publish to bintray
