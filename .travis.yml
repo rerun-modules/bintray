@@ -25,7 +25,6 @@ addons:
       - rerun
     sources:
       - sourceline: 'deb https://dl.bintray.com/rerun/rerun-deb /'
-      - sourceline: 'deb-src https://dl.bintray.com/rerun/rerun-deb /'
 env:
   global:
     - secure: "OKG83uTOFHfHbxrd8nN5JRVLGirXL/Kjto6UBi0wLi7GpC452nL0P87XQlVI\n+G27H0p38vbZ6WxHoLadu2dW+B4T/J5maPmSZPE4CZVbOORjAx/8fV3SYoBn\nj12ZNEgORkOSqVvnDBxJLDhzwZeVwiFsJcJ9H5S+3PmYIZrX4C0="
