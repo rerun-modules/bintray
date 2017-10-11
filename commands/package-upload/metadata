@@ -3,4 +3,4 @@
 # Sat May 18 06:54:46 PDT 2013
 NAME=package-upload
 DESCRIPTION="Uploads and publishes a package file."
-OPTIONS="apikey file org repo version user package descriptor"
+OPTIONS="file org repo version user package descriptor apikey"

@@ -30,19 +30,19 @@ echo "Packaging the build..."
 # Build the archive!
 rerun stubbs:archive --modules ${mymod}
 BIN=rerun.sh
-[ ! -f ${BIN} ] && {
+[ ! -f "${BIN}" ] && {
     echo >&2 "ERROR: ${BIN} archive was not created."; exit 1
 }
 
 # Test the archive by making it do a command list.
-./${BIN} ${mymod}
+./${BIN} "${mymod}"
 
 # Build a deb
 #-------------
-rerun stubbs:archive --modules ${mymod} --format deb --version ${VERSION} --release ${RELEASE:=1}
+rerun stubbs:archive --modules "${mymod}" --format deb --version "${VERSION}" --release "${RELEASE:=1}"
 sysver="${VERSION}-${RELEASE}"
-DEB=rerun-${mymod}_${sysver}_all.deb
-[ ! -f ${DEB} ] && {
+DEB="rerun-${mymod}_${sysver}_all.deb"
+[ ! -f "${DEB}" ] && {
     echo >&2 "ERROR: ${DEB} file was not created."
     files=( *.deb )
     echo >&2 "ERROR: ${#files[*]} files matching .deb: ${files[*]}"
@@ -50,9 +50,9 @@ DEB=rerun-${mymod}_${sysver}_all.deb
 }
 # Build a rpm
 #-------------
-rerun stubbs:archive --modules ${mymod} --format rpm --version ${VERSION} --release ${RELEASE}
+rerun stubbs:archive --modules "${mymod}" --format rpm --version "${VERSION}" --release "${RELEASE}"
 RPM=rerun-${mymod}-${sysver}.linux.noarch.rpm
-[ ! -f ${RPM} ] && {
+[ ! -f "${RPM}" ] && {
     echo >&2 "ERROR: ${RPM} file was not created."
     files=( *.rpm )
     echo >&2 "ERROR: ${#files[*]} files matching .rpm: ${files[*]}"
@@ -64,26 +64,26 @@ if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; 
   export USER=${BINTRAY_USER:?"Setup Travis with BINTRAY_USER env variable"}
   export APIKEY=${BINTRAY_APIKEY:?"Setup Travis with BINTRAY_APIKEY env variable"}
   export ORG=${BINTRAY_ORG:?"Setup Travis with BINTRAY_ORG env variable"}
-  export PACKAGE=${mymod}
+  export PACKAGE="${mymod}"
   
   # Upload and publish to bintray
   echo "Uploading ${BIN} to bintray: /${BINTRAY_ORG}/rerun-modules/${mymod}/${VERSION}..."
   export REPO="rerun-modules"
-  rerun bintray:package-upload --apikey ${BINTRAY_APIKEY} --file ${BIN}
+  rerun bintray:package-upload --file "${BIN}"
 
   echo "Uploading debian package ${DEB} to bintray: /${BINTRAY_ORG}/rerun-deb ..."
   export PACKAGE="rerun-${mymod}"
   export REPO="rerun-deb"
-  rerun bintray:package-upload-deb --apikey ${BINTRAY_APIKEY} --version "${sysver}" --file ${DEB} --deb_architecture all
-  rerun bintray:package-upload --apikey ${BINTRAY_APIKEY} --version "${sysver}" --file "${PACKAGE}_${VERSION}.orig.tar.gz"
-  rerun bintray:package-upload --apikey ${BINTRAY_APIKEY} --version "${sysver}" --file "${PACKAGE}_${sysver}.debian.tar.xz"
-  rerun bintray:package-upload --apikey ${BINTRAY_APIKEY} --version "${sysver}" --file "${PACKAGE}_${sysver}.amd64.build"
-  rerun bintray:package-upload --apikey ${BINTRAY_APIKEY} --version "${sysver}" --file "${PACKAGE}_${sysver}.amd64.changes"
-  rerun bintray:package-upload --apikey ${BINTRAY_APIKEY} --version "${sysver}" --file "${PACKAGE}_${sysver}.dsc"
+  rerun bintray:package-upload-deb --version "${sysver}" --file "${DEB}" --deb_architecture all
+  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${VERSION}.orig.tar.gz"
+  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.debian.tar.xz"
+  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.amd64.build"
+  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.amd64.changes"
+  rerun bintray:package-upload --version "${sysver}" --file "${PACKAGE}_${sysver}.dsc"
 
   echo "Uploading rpm package ${RPM} to bintray: /${BINTRAY_ORG}/rerun-rpm ..."
   export REPO="rerun-rpm"
-  rerun bintray:package-upload --apikey ${BINTRAY_APIKEY} --version ${sysver} --file ${RPM}
+  rerun bintray:package-upload --version "${sysver}" --file "${RPM}"
 
 else
   echo "***************************"

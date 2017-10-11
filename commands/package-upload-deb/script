@@ -10,7 +10,7 @@
 # and show its options.
 # 
 #/ command: bintray:package-upload-deb: "Upload a debian package to a bintray APT repo which requires a few extra parameters"
-#/ usage: rerun bintray:package-upload-deb  --apikey <>  --file <>  --org <>  --repo <>  --version <>  --user <>  --package <> [ --descriptor <descriptor.json>]  --deb_distribution <precise,trusty,sqeeze,wheezy>  --deb_component <main>  --deb_architecture <amd64> 
+#/ usage: rerun bintray:package-upload-deb  --file <>  --org <>  --repo <>  --version <>  --user <>  --package <> [ --descriptor <descriptor.json>]  --deb_distribution <precise,trusty,sqeeze,wheezy>  --deb_component <main>  --deb_architecture <amd64>  --apikey <> 
 
 # Load common functions
 # ---------------------
@@ -47,7 +47,7 @@ set -o nounset -o pipefail
 # declared by `rerun` or by the option parser function.
 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: APIKEY FILE ORG REPO VERSION USER PACKAGE DESCRIPTOR DEB_DISTRIBUTION DEB_COMPONENT DEB_ARCHITECTURE
+#/ option-variables: FILE ORG REPO VERSION USER PACKAGE DESCRIPTOR DEB_DISTRIBUTION DEB_COMPONENT DEB_ARCHITECTURE APIKEY
 
 # The `rerun_options_parse` function processes the command line
 # arguments. Each accepted command line flag results in setting 

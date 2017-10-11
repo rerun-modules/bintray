@@ -9,8 +9,8 @@
 # The `command` and `usage` comments describe the command
 # and show its options.
 # 
-#/ command: bintray:package-exists: "checks if the package exists."
-#/ usage: rerun bintray:package-exists  --user <>  --apikey <>  --org <>  --package <>  --repo <> 
+#/ command: bintray:package-exists: "Checks if the package exists."
+#/ usage: rerun bintray:package-exists  --user <>  --org <>  --package <>  --repo <>  --apikey <> 
 
 # Load common functions
 # ---------------------
@@ -47,7 +47,7 @@ set -o nounset -o pipefail
 # declared by `rerun` or by the option parser function.
 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: USER APIKEY ORG PACKAGE REPO
+#/ option-variables: USER ORG PACKAGE REPO APIKEY
 
 # The `rerun_options_parse` function processes the command line
 # arguments. Each accepted command line flag results in setting 

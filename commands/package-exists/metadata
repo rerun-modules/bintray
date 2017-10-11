@@ -3,4 +3,4 @@
 # Sat May 18 16:23:04 PDT 2013
 NAME=package-exists
 DESCRIPTION="Checks if the package exists."
-OPTIONS="user apikey org package repo"
+OPTIONS="user org package repo apikey"
