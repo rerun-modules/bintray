@@ -368,8 +368,7 @@ scrape_bintray_package_for_versions() {
   local curl_command="curl --silent --connect-timeout ${curl_connect_timeout} --max-time ${curl_max_time}"
   local curl_endpoint=
   local curl_output=
-  local version_re='([0-9]{1,})\.([0-9]{1,})(\.([0-9]{1,})(-(([0-9a-zA-Z]{1,}[.-]{0,1}){0,}[0-9a-zA-Z]{1,})){0,1}){0,1}'
-  local grep_re="rel=\"nofollow\">$version_re\/<\/a><\/pre>$"
+  local grep_re="rel=\"nofollow\">.*\/<\/a><\/pre>$"
   local trim_prefix="rel=\"nofollow\">"
   local trim_suffix="\/<\/a></pre>"
   local version_results=
@@ -426,18 +425,8 @@ scrape_bintray_package_for_versions() {
     parsed_version_results+=("$version_temp")
   done
   
-  # validate versions
-  #   hopefully catches if they were malformed
-  #   after trimming prefix and suffix
-  
   for parsed_version in ${parsed_version_results[@]}; do
-    validated_version_results+=($(echo $parsed_version | grep -Eo "^$version_re$")) || {
-      rerun_log error "version failed to validate post-extraction: $parsed_version"; return 1
-    }
-  done
-  
-  for validated_version in ${validated_version_results[@]}; do
-    echo "$validated_version"
+    echo "$parsed_version"
   done
   
   return 0
@@ -471,8 +460,7 @@ scrape_bintray_package_version_for_files() {
   local curl_command="curl --silent --connect-timeout ${curl_connect_timeout} --max-time ${curl_max_time}"
   local curl_endpoint=
   local curl_output=
-  local version_re='([0-9]{1,})\.([0-9]{1,})(\.([0-9]{1,})(-(([0-9a-zA-Z]{1,}[.-]{0,1}){0,}[0-9a-zA-Z]{1,})){0,1}){0,1}'
-  local grep_re="rel=\"nofollow\">.*$version_re.*<\/a><\/pre>$"
+  local grep_re="rel=\"nofollow\">.*<\/a><\/pre>$"
   local trim_prefix="rel=\"nofollow\">"
   local trim_suffix="<\/a></pre>"
   local file_results=
@@ -533,18 +521,8 @@ scrape_bintray_package_version_for_files() {
     parsed_file_results+=("$file_temp")
   done
   
-  # validate files
-  #   hopefully catches if they were malformed
-  #   after trimming prefix and suffix
-  
   for parsed_file in ${parsed_file_results[@]}; do
-    validated_file_results+=($(echo $parsed_file | grep -Eo "^.*$version_re.*$")) || {
-      rerun_log error "file failed to validate post-extraction: $parsed_file"; return 1
-    }
-  done
-  
-  for validated_file in ${validated_file_results[@]}; do
-    echo "$validated_file"
+    echo "$parsed_file"
   done
   
   return 0

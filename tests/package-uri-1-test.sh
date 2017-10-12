@@ -115,7 +115,7 @@ it_returns_req_ver_uri_when_ver_w_ext_exists() {
     --repo "$DEFAULT_REPO" \
     --package "$DEFAULT_PACKAGE" \
     --version "$DEFAULT_VERSION" \
-    --extension "$DEFAULT_EXTENSION") || echo "rerun test call failed with exit code: $?"
+    --extension "$DEFAULT_EXTENSION") || echo >&2 "rerun test call failed with exit code: $?"
   
   # validate results
   test "$requested_version_uri" == "$DEFAULT_VERSION_URI_W_EXT"
@@ -154,7 +154,7 @@ it_returns_req_ver_uris_when_ver_exists() {
     --org "$DEFAULT_ORG" \
     --repo "$DEFAULT_REPO" \
     --package "$DEFAULT_PACKAGE" \
-    --version "$DEFAULT_VERSION") || echo "rerun test call failed with exit code: $?"
+    --version "$DEFAULT_VERSION") || echo >&2 "rerun test call failed with exit code: $?"
   
   # validate results
   test "$requested_version_uris" == "$DEFAULT_VERSION_URIS"
