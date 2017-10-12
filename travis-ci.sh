@@ -10,10 +10,6 @@ sed -i -r 's,^VERSION=([0-9]+\.[0-9]+)\.0$,VERSION=\1.'"${TRAVIS_BUILD_NUMBER:?S
 export VERSION="$(awk -F= '/VERSION/ {print $2}' metadata)"
 mymod="$(awk -F= '/NAME/ {print $2}' metadata)"
 
-# Test.
-# --------
-rerun stubbs: test --module ${mymod}
-
 echo "Building version ${VERSION:?"Corrupt metadata file"} of ${mymod:?"Corrupt metadata file"}..."
 # Create a scratch directory and change directory to it.
 WORK_DIR=$(mktemp -d "/tmp/build-${mymod}.XXXXXX")
@@ -26,6 +22,10 @@ cp -p metadata "${WORK_DIR}/${mymod}"/
 
 # Setup the rerun execution environment.
 export RERUN_MODULES="${WORK_DIR}:${RERUN_MODULES:-/usr/lib/rerun/modules}"
+
+# Test.
+# --------
+rerun stubbs: test --module ${mymod}
 
 # Build the module.
 # -----------------
