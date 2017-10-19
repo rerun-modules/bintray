@@ -3,5 +3,5 @@
 # Mon Oct  9 14:19:57 CDT 2017
 NAME=package-uri
 DESCRIPTION="Retrieves URIs for remote package artifacts of a specified version."
-OPTIONS="org repo package version and-later extension"
+OPTIONS="org repo package version extension"
 GENERATE_HELP=true

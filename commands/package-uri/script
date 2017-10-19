@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: bintray:package-uri: "Retrieves URIs for remote package artifacts of a specified version."
-#/ usage: rerun bintray:package-uri  --org <>  --repo <>  --package <>  --version <> [ --and-later] [ --extension <>] 
+#/ usage: rerun bintray:package-uri  --org <>  --repo <>  --package <>  --version <> [ --extension <>] 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ORG REPO PACKAGE VERSION AND_LATER EXTENSION
+#/ option-variables: ORG REPO PACKAGE VERSION EXTENSION
 
 . $RERUN_MODULE_DIR/lib/functions.sh package-uri || { 
   echo >&2 "Failed loading function library." ; exit 1 ; 
