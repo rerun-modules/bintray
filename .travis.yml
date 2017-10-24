@@ -1,5 +1,3 @@
-dist: trusty
-sudo: false
 language: c
 compiler: gcc
 if: tag IS blank
@@ -28,7 +26,7 @@ addons:
     - sourceline: deb https://dl.bintray.com/rerun/rerun-deb /
 env:
   global:
-  - secure: "OKG83uTOFHfHbxrd8nN5JRVLGirXL/Kjto6UBi0wLi7GpC452nL0P87XQlVI\n+G27H0p38vbZ6WxHoLadu2dW+B4T/J5maPmSZPE4CZVbOORjAx/8fV3SYoBn\nj12ZNEgORkOSqVvnDBxJLDhzwZeVwiFsJcJ9H5S+3PmYIZrX4C0="
   - BINTRAY_USER=ahonor
   - BINTRAY_ORG=rerun
+  - secure: OKG83uTOFHfHbxrd8nN5JRVLGirXL/Kjto6UBi0wLi7GpC452nL0P87XQlVI\G27H0p38vbZ6WxHoLadu2dW+B4T/J5maPmSZPE4CZVbOORjAx/8fV3SYoBnj12ZNEgORkOSqVvnDBxJLDhzwZeVwiFsJcJ9H5S+3PmYIZrX4C0=
   - secure: auYPHIqNVWS95blHFV6gB2SHH+IDsiJ9KdZRK3uP+3IkcAySsHPSWeuhYzg7bmqkDAn6ad0IsZRTkIMarK9tJDsEgMqksGM7lnTWvvUxEVCm4s7nB/M0uKhZCTtMRDRNaFaXkOF05ZIgl17Hjq7SWwekF31hYLWCYo6PLZen4Kk=
